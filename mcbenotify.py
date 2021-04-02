@@ -1,6 +1,6 @@
-from notifier import Notifier
-from configer import Configer
-from logmonitor import LogMonitor
+from webhookposter import WebhookPoster
+from configfilereader import ConfigFileReader
+from logreader import LogReader
 from logprocessor import LogProcessor
 import glob
 import time
@@ -18,25 +18,25 @@ def printlog(mes):
 
 
 # config
-configer = Configer()
-UPDATE_INTERVAL = configer.get_int('UpdateInterval')
-IGNORE_PLAYERS = configer.get_str_list('IgnorePlayers')
-WEBHOOK_URL = configer.get_str('WebhookURL')
+configfilereader = ConfigFileReader()
+UPDATE_INTERVAL = configfilereader.read_int('UpdateInterval')
+IGNORE_PLAYERS = configfilereader.read_str_list('IgnorePlayers')
+WEBHOOK_URL = configfilereader.read_str('WebhookURL')
 
 # メイン処理に必要なオブジェクト作成
 logprocessor = LogProcessor()
 LOGFILENAME = find_latest_log()
-notifier = Notifier(WEBHOOK_URL)
-logmonitor = LogMonitor(LOGFILENAME)
+webhookposter = WebhookPoster(WEBHOOK_URL)
+logreader = LogReader(LOGFILENAME)
 
 printlog(''+LOGFILENAME+'を監視します。')
 
 while True:
     time.sleep(UPDATE_INTERVAL)
-    diff = logmonitor.update()
+    diff = logreader.update()
     text = logprocessor.process(diff)
-    bool_sent = notifier.notify(text)
-    if bool_sent:
+    whether_posted = webhookposter.notify(text)
+    if whether_posted:
         printlog('Notification sent.')
     printlog('Updated. Time needed: '+str(
-        (dt.datetime.now() - logmonitor.last_update).total_seconds()))
+        (dt.datetime.now() - logreader.last_update).total_seconds()))
