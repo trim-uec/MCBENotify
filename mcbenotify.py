@@ -33,9 +33,9 @@ printlog(''+LOGFILENAME+'を監視します。')
 
 while True:
     time.sleep(UPDATE_INTERVAL)
-    diff = logreader.update()
+    diff = logreader.added_lines()
     text = logprocessor.process(diff)
-    whether_posted = webhookposter.notify(text)
+    whether_posted = webhookposter.post_onlytext(text)
     if whether_posted:
         printlog('Notification sent.')
     printlog('Updated. Time needed: '+str(
