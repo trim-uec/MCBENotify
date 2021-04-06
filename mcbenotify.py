@@ -35,8 +35,8 @@ while True:
     time.sleep(UPDATE_INTERVAL)
     diff = logreader.added_lines()
     text = logprocessor.process(diff)
-    whether_posted = webhookposter.post_onlytext(text)
-    if whether_posted:
+    has_posted = webhookposter.post_onlytext(text)
+    if has_posted:
         printlog('Notification sent.')
     printlog('Updated. Time needed: '+str(
         (dt.datetime.now() - logreader.last_update).total_seconds()))
